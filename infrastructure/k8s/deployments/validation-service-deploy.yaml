@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: validation-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: validation-service
+  template:
+    metadata:
+      labels:
+        app: validation-service
+    spec:
+      containers:
+        - name: validation-service
+          image: ghcr.io/ryanwelchtech/sentinel-sda-validation-service:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_SECRET
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: sentinel-config
+                  key: LOG_LEVEL
+          ports:
+            - containerPort: 8000

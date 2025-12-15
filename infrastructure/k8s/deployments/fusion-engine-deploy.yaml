@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fusion-engine
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fusion-engine
+  template:
+    metadata:
+      labels:
+        app: fusion-engine
+    spec:
+      containers:
+        - name: fusion-engine
+          image: ghcr.io/ryanwelchtech/sentinel-sda-fusion-engine:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: sentinel-config
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: sentinel-config
+                  key: REDIS_PORT
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: sentinel-config
+                  key: LOG_LEVEL
+          ports:
+            - containerPort: 8000

@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fusion-engine
+  namespace: sentinel-sda
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fusion-engine
+  template:
+    metadata:
+      labels:
+        app: fusion-engine
+    spec:
+      containers:
+        - name: fusion-engine
+          image: sentinel-sda-fusion-engine:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SERVICE_NAME
+              value: fusion-engine
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_SECRET
+            - name: JWT_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_ISSUER
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 400m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fusion-engine
+  namespace: sentinel-sda
+spec:
+  selector:
+    app: fusion-engine
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000

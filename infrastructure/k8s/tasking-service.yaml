@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasking-service
+  namespace: sentinel-sda
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tasking-service
+  template:
+    metadata:
+      labels:
+        app: tasking-service
+    spec:
+      containers:
+        - name: tasking-service
+          image: sentinel-sda-tasking-service:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SERVICE_NAME
+              value: tasking-service
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_SECRET
+            - name: JWT_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_ISSUER
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tasking-service
+  namespace: sentinel-sda
+spec:
+  selector:
+    app: tasking-service
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000

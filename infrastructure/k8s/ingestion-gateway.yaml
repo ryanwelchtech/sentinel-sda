@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingestion-gateway
+  namespace: sentinel-sda
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ingestion-gateway
+  template:
+    metadata:
+      labels:
+        app: ingestion-gateway
+    spec:
+      containers:
+        - name: ingestion-gateway
+          image: sentinel-sda-ingestion-gateway:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SERVICE_NAME
+              value: ingestion-gateway
+            - name: VALIDATION_URL
+              value: http://validation-service:8000/validate
+            - name: HTTP_TIMEOUT_SECONDS
+              value: "3.0"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_SECRET
+            - name: JWT_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_ISSUER
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingestion-gateway
+  namespace: sentinel-sda
+spec:
+  selector:
+    app: ingestion-gateway
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000

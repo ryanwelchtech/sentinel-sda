@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mission-optimizer
+  namespace: sentinel-sda
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mission-optimizer
+  template:
+    metadata:
+      labels:
+        app: mission-optimizer
+    spec:
+      containers:
+        - name: mission-optimizer
+          image: sentinel-sda-mission-optimizer:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SERVICE_NAME
+              value: mission-optimizer
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: TASKING_URL
+              value: http://tasking-service:8000/tasking
+            - name: OPT_INTERVAL_SECONDS
+              value: "5.0"
+            - name: HTTP_TIMEOUT_SECONDS
+              value: "3.0"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_SECRET
+            - name: JWT_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_ISSUER
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 400m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mission-optimizer
+  namespace: sentinel-sda
+spec:
+  selector:
+    app: mission-optimizer
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000

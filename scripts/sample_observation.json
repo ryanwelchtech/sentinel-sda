@@ -1,0 +1,23 @@
+{
+  "event_id": "evt-manual-1",
+  "sensor_id": "manual-1",
+  "sensor_type": "radar",
+  "timestamp": "2025-12-15T00:00:00Z",
+  "object_id": "obj-999",
+  "measurement": {
+    "x_km": 1000,
+    "y_km": 2000,
+    "z_km": 3000,
+    "vx_kms": 0.1,
+    "vy_kms": 0.2,
+    "vz_kms": 0.3
+  },
+  "quality": {
+    "snr_db": 12,
+    "measurement_sigma": 0.3
+  },
+  "integrity": {
+    "signed": true,
+    "signature": "demo"
+  }
+}

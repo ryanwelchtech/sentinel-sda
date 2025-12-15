@@ -1,0 +1,167 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sensor-sim-radar
+  namespace: sentinel-sda
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sensor-sim
+      sensor: radar-1
+  template:
+    metadata:
+      labels:
+        app: sensor-sim
+        sensor: radar-1
+    spec:
+      containers:
+        - name: sensor-sim
+          image: sentinel-sda-sensor-sim:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SERVICE_NAME
+              value: sensor-sim
+            - name: SENSOR_ID
+              value: radar-1
+            - name: SENSOR_TYPE
+              value: radar
+            - name: INGEST_URL
+              value: http://ingestion-gateway:8000/observations
+            - name: TASKING_URL
+              value: http://tasking-service:8000/tasking
+            - name: BASE_RATE_HZ
+              value: "1.5"
+            - name: OBJECT_POOL
+              value: "25"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_SECRET
+            - name: JWT_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_ISSUER
+          resources:
+            requests:
+              cpu: 25m
+              memory: 96Mi
+            limits:
+              cpu: 200m
+              memory: 192Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sensor-sim-optical
+  namespace: sentinel-sda
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sensor-sim
+      sensor: optical-1
+  template:
+    metadata:
+      labels:
+        app: sensor-sim
+        sensor: optical-1
+    spec:
+      containers:
+        - name: sensor-sim
+          image: sentinel-sda-sensor-sim:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SERVICE_NAME
+              value: sensor-sim
+            - name: SENSOR_ID
+              value: optical-1
+            - name: SENSOR_TYPE
+              value: optical
+            - name: INGEST_URL
+              value: http://ingestion-gateway:8000/observations
+            - name: TASKING_URL
+              value: http://tasking-service:8000/tasking
+            - name: BASE_RATE_HZ
+              value: "1.0"
+            - name: OBJECT_POOL
+              value: "25"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_SECRET
+            - name: JWT_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_ISSUER
+          resources:
+            requests:
+              cpu: 25m
+              memory: 96Mi
+            limits:
+              cpu: 200m
+              memory: 192Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sensor-sim-space
+  namespace: sentinel-sda
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sensor-sim
+      sensor: space-1
+  template:
+    metadata:
+      labels:
+        app: sensor-sim
+        sensor: space-1
+    spec:
+      containers:
+        - name: sensor-sim
+          image: sentinel-sda-sensor-sim:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: SERVICE_NAME
+              value: sensor-sim
+            - name: SENSOR_ID
+              value: space-1
+            - name: SENSOR_TYPE
+              value: space
+            - name: INGEST_URL
+              value: http://ingestion-gateway:8000/observations
+            - name: TASKING_URL
+              value: http://tasking-service:8000/tasking
+            - name: BASE_RATE_HZ
+              value: "1.2"
+            - name: OBJECT_POOL
+              value: "25"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_SECRET
+            - name: JWT_ISSUER
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_ISSUER
+          resources:
+            requests:
+              cpu: 25m
+              memory: 96Mi
+            limits:
+              cpu: 200m
+              memory: 192Mi

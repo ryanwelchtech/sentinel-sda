@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mission-optimizer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mission-optimizer
+  template:
+    metadata:
+      labels:
+        app: mission-optimizer
+    spec:
+      containers:
+        - name: mission-optimizer
+          image: ghcr.io/ryanwelchtech/sentinel-sda-mission-optimizer:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: sentinel-config
+                  key: LOG_LEVEL
+          ports:
+            - containerPort: 8000

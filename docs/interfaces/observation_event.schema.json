@@ -1,0 +1,46 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://example.local/sentinel-sda/observation.schema.json",
+    "title": "Observation",
+    "type": "object",
+    "required": ["event_id", "sensor_id", "sensor_type", "timestamp", "object_id", "measurement", "quality", "integrity"],
+    "properties": {
+        "event_id": { "type": "string", "minLength": 1 },
+        "sensor_id": { "type": "string", "minLength": 1 },
+        "sensor_type": { "type": "string", "enum": ["radar", "optical", "space"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "object_id": { "type": "string", "minLength": 1 },
+        "measurement": {
+            "type": "object",
+            "required": ["x_km", "y_km", "z_km", "vx_kms", "vy_kms", "vz_kms"],
+            "properties": {
+                "x_km": { "type": "number" },
+                "y_km": { "type": "number" },
+                "z_km": { "type": "number" },
+                "vx_kms": { "type": "number" },
+                "vy_kms": { "type": "number" },
+                "vz_kms": { "type": "number" }
+            },
+            "additionalProperties": false
+        },
+        "quality": {
+            "type": "object",
+            "required": ["snr_db", "measurement_sigma"],
+            "properties": {
+                "snr_db": { "type": "number" },
+                "measurement_sigma": { "type": "number", "minimum": 0 }
+            },
+            "additionalProperties": false
+        },
+        "integrity": {
+            "type": "object",
+            "required": ["signed", "signature"],
+            "properties": {
+                "signed": { "type": "boolean" },
+                "signature": { "type": "string" }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

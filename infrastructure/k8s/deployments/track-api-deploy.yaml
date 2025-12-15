@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: track-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: track-api
+  template:
+    metadata:
+      labels:
+        app: track-api
+    spec:
+      containers:
+        - name: track-api
+          image: ghcr.io/ryanwelchtech/sentinel-sda-track-api:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: sentinel-jwt
+                  key: JWT_SECRET
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: sentinel-config
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: sentinel-config
+                  key: REDIS_PORT
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: sentinel-config
+                  key: LOG_LEVEL
+          ports:
+            - containerPort: 8000

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasking-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tasking-service
+  template:
+    metadata:
+      labels:
+        app: tasking-service
+    spec:
+      containers:
+        - name: tasking-service
+          image: ghcr.io/ryanwelchtech/sentinel-sda-tasking-service:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: sentinel-config
+                  key: LOG_LEVEL
+          ports:
+            - containerPort: 8000
