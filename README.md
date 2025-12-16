@@ -29,12 +29,14 @@ This project is designed to demonstrate systems engineering principles, mission-
 - Zero Trust service-to-service communication (JWT-based initially)
 
 ## Repository Structure
+```text
 sentinel-sda/
 ├── docs/
 ├── services/
 ├── infrastructure/
 ├── ci/
 └── scripts/
+```
 
 
 ## How This Maps to Systems Engineering
