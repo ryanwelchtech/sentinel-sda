@@ -80,3 +80,8 @@ Expected system behavior under fault conditions.
 | Validation unavailable | Ingestion fails closed|
 | Fusion restart | Temporary track staleness, automatic recovery|
 | Redis unavailable | Track API degraded or unavailable|
+
+
+## Agentic Decision Support Layer
+
+Sentinel SDA includes a Mission Planning Agent that consumes object tracks and mission intent to generate human-in-the-loop tasking recommendations using a hybrid rules-plus-AI approach. See `docs/agentic_architecture.md` for diagrams, trust boundaries, and failure behavior.

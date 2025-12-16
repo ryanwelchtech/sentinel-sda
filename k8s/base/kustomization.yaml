@@ -1,0 +1,30 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: sentinel-sda
+
+resources:
+  - namespace.yaml
+  
+  - configmaps/mission-planning-agent.yaml
+  - configmaps/policy.yaml
+
+  - deployments/ingestion-gateway.yaml
+  - deployments/validation-service.yaml
+  - deployments/fusion-engine.yaml
+  - deployments/track-api.yaml
+  - deployments/tasking-service.yaml
+  - deployments/mission-optimizer.yaml
+  - deployments/mission-planning-agent.yaml   # NEW
+
+  - services/ingestion-gateway.yaml
+  - services/validation-service.yaml
+  - services/fusion-engine.yaml
+  - services/track-api.yaml
+  - services/tasking-service.yaml
+  - services/mission-optimizer.yaml
+  - services/mission-planning-agent.yaml      # NEW
+
+  - configmaps/mission-planning-agent.yaml    # NEW
+  - redis.yaml
+  - secret-jwt.yaml

@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mission-planning-agent
+  labels:
+    app: mission-planning-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mission-planning-agent
+  template:
+    metadata:
+      labels:
+        app: mission-planning-agent
+    spec:
+      containers:
+        - name: mission-planning-agent
+          image: ghcr.io/ryanwelchtech/sentinel-sda-mission-planning-agent:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9000
+          envFrom:
+            - configMapRef:
+                name: mission-planning-agent-config
+            - secretRef:
+                name: secret-jwt
+
+          volumeMounts:
+                - name: policy
+                  mountPath: /config
+
+      volumeMounts:
+        - name: policy
+          mountPath: /config
+                

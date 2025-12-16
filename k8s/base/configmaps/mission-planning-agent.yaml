@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mission-planning-agent-config
+data:
+  TRACK_API_BASE: "http://track-api:8000"
+  POLICY_PATH: "/config/policy.yaml"
+  LLM_ENABLED: "false"

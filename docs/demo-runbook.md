@@ -195,7 +195,80 @@ kubectl -n sentinel-sda delete pod -l app=fusion-engine
 kubectl -n sentinel-sda rollout status deploy/fusion-engine --timeout=180s
 ```
 
-8. Troubleshooting
+8. Scenario: Agentic Mission Planning (Hybrid Rules + AI Rationale)
+#### Goal
+Generate a mission tasking plan using a hybrid approach:
+Rules enforce constraints and scoring, while the LLM is optional and provides a readable rationale.
+
+#### Prerequisites
+
+Ensure the core system is running:
+
+```powershell
+kubectl -n sentinel-sda get pods
+```
+
+Port-forward Track API and Agent:
+
+```powershell
+kubectl -n sentinel-sda port-forward svc/track-api 8000:8000
+kubectl -n sentinel-sda port-forward svc/mission-planning-agent 9000:9000
+```
+
+##### Step 1: Create or reuse a valid JWT token
+
+If you already have scripts/make_token.py in sentinel-sda:
+
+```powershell
+$token = (python scripts/make_token.py --secret $env:JWT_SECRET).Trim()
+```
+
+
+If your agent uses the cluster secret directly, you may not need this locally. If your agent calls Track API with JWT, ensure the agent has access to the same JWT secret via env or secretRef.
+
+#### Step 2: Confirm Track API has data
+```powershell
+curl.exe -s -H "Authorization: Bearer $token" "http://localhost:8000/tracks?limit=5"
+```
+
+
+If you don’t see tracks yet, inject an observation using your existing ingestion scenario first.
+
+#### Step 3: Request a plan from the agent
+```powershell
+curl.exe -s -X POST "http://localhost:9000/plan" `
+  -H "Content-Type: application/json" `
+  -d "{\"mission_id\":\"demo-ops-1\",\"time_horizon_min\":30,\"max_tasks\":5,\"operator_intent\":\"Prioritize low confidence tracks, maintain sensor diversity, and focus on high altitude objects\"}"
+```
+
+#### Expected result
+
+You should receive a JSON response containing:
+
+- `tasks`: ranked recommendations with scores and constraint checks
+- `notes`: a rationale summary (LLM generated if enabled, otherwise deterministic notes)
+- `llm_used`: true or false
+
+#### Optional: Toggle the LLM layer
+
+If you add LLM support later, enable it via ConfigMap:
+
+-Set `LLM_ENABLED=true`
+-Provide OpenAI credentials via a Secret
+Then restart:
+
+```powershell
+kubectl -n sentinel-sda rollout restart deploy/mission-planning-agent
+```
+
+#### What this demonstrates
+
+- Human-in-the-loop decision support, not autonomous execution
+- Deterministic, auditable rules for constraints
+- Explainable AI for trade-off discussion and operator briefing
+- Integration with SDA tracks, consistent with mission planning workflows
+
+9. Troubleshooting
 ```powershell
 kubectl -n sentinel-sda get events --sort-by=.lastTimestamp | Select-Object -Last 40
 ```

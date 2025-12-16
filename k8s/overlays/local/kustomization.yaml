@@ -2,7 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../../
+  - ../../base
 
 images:
   - name: ghcr.io/ryanwelchtech/sentinel-sda-ingestion-gateway
@@ -32,3 +32,8 @@ images:
   - name: ghcr.io/ryanwelchtech/sentinel-sda-sensor-sim
     newName: sentinel-sda-sensor-sim
     newTag: local
+
+  - name: ghcr.io/ryanwelchtech/sentinel-sda-mission-planning-agent
+    newName: sentinel-sda-mission-planning-agent
+    newTag: local
+

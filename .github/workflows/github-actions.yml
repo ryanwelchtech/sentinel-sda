@@ -41,6 +41,9 @@ jobs:
           - name: sensor-sim
             context: services/sensor-sim
             image: sentinel-sda-sensor-sim
+          - name: mission-planning-agent
+            context: services/mission-planning-agent
+            image: sentinel-sda-mission-planning-agent
 
     steps:
       - name: Checkout

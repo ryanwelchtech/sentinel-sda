@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mission-planning-policy
+data:
+  policy.yaml: |
+    policy_version: "1.0"
+    mission_defaults:
+      time_horizon_min: 30
+      max_tasks: 5
+    hard_constraints:
+      min_track_confidence: 0.65
+      allowed_sensor_types: ["radar", "optical", "space"]
+      max_tasks_per_sensor: 3
+      max_tasks_per_object: 1
+      no_task_z_km_below: -1.0
+    scoring:
+      weights:
+        mission_priority: 0.35
+        confidence: 0.30
+        recency: 0.15
+        geometry: 0.10
+        diversity: 0.10
+    priority_rules:
+      - name: "Prefer high altitude objects"
+        when:
+          z_km_min: 35000
+        boost: 0.15
+      - name: "Revisit low confidence tracks"
+        when:
+          confidence_max: 0.75
+        boost: 0.10
+      - name: "Prefer recently updated tracks"
+        when:
+          updated_within_min: 15
+        boost: 0.10
+    tie_break:
+      llm_enabled: false
+      max_candidates_for_llm: 8
+      strategy: "llm_then_rules"
+    sensor_inventory:
+      sensors:
+        - sensor_id: "radar-1"
+          sensor_type: "radar"
+          is_available: true
+          max_tasks: 3
+          coverage_hint: "LEO/MEO"
+        - sensor_id: "optical-1"
+          sensor_type: "optical"
+          is_available: true
+          max_tasks: 2
+          coverage_hint: "GEO/clear-sky"
+        - sensor_id: "space-1"
+          sensor_type: "space"
+          is_available: true
+          max_tasks: 2
+          coverage_hint: "GEO/continuous"
